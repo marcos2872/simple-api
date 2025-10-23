@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   AbilityBuilder,
   AbilityClass,
@@ -7,14 +8,15 @@ import {
 } from '@casl/ability';
 import { Injectable } from '@nestjs/common';
 import { Action } from './action.enum';
+import { User } from '@prisma/client';
 
-type Subjects = 'User' | InferSubjects<'User'>;
+type Subjects = InferSubjects<'User'>;
 export type AppAbility = PureAbility<[Action, Subjects]>;
 
 @Injectable()
 export class AbilityFactory {
-  createForUser(user: any) {
-    const { can, cannot, build } = new AbilityBuilder<PureAbility>(
+  createForUser(user: User) {
+    const { can, cannot, build } = new AbilityBuilder<AppAbility>(
       PureAbility as AbilityClass<AppAbility>,
     );
 

@@ -1,11 +1,7 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AbilityFactory } from './ability.factory';
+import { Request } from 'express';
 
 @Injectable()
 export class PoliciesGuard implements CanActivate {
@@ -15,7 +11,7 @@ export class PoliciesGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest();
+    const request: Request = context.switchToHttp().getRequest();
     const user = request.user;
     const ability = this.abilityFactory.createForUser(user);
     // attach ability to request for later decorators

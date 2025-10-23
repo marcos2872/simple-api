@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,7 +17,7 @@ export class UsersService {
     });
   }
 
-  findAll() {
+  async findAll() {
     return this.prisma.user.findMany({
       select: {
         id: true,
@@ -50,7 +46,7 @@ export class UsersService {
     }
     try {
       return await this.prisma.user.update({ where: { id }, data: dto });
-    } catch (e) {
+    } catch {
       throw new NotFoundException('User not found');
     }
   }
@@ -59,7 +55,7 @@ export class UsersService {
     try {
       await this.prisma.user.delete({ where: { id } });
       return { deleted: true };
-    } catch (e) {
+    } catch {
       throw new NotFoundException('User not found');
     }
   }
