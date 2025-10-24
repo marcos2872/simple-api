@@ -34,15 +34,15 @@ describe('Users (e2e)', () => {
     const adminLoginResponse = await request(app.getHttpServer())
       .post('/api/auth/login')
       .send({ email: 'admin@test.com', password: 'password123' });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    adminToken = adminLoginResponse.body.access_token;
+    const adminLoginBody = adminLoginResponse.body as { access_token: string };
+    adminToken = adminLoginBody.access_token;
 
     // Login as user1
     const user1LoginResponse = await request(app.getHttpServer())
       .post('/api/auth/login')
       .send({ email: 'user1@test.com', password: 'password123' });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    user1Token = user1LoginResponse.body.access_token;
+    const user1LoginBody = user1LoginResponse.body as { access_token: string };
+    user1Token = user1LoginBody.access_token;
   });
 
   afterAll(async () => {
@@ -57,9 +57,9 @@ describe('Users (e2e)', () => {
         .get('/api/users')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
-
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThanOrEqual(3);
+      const list = response.body as Array<{ id: string }>;
+      expect(Array.isArray(list)).toBe(true);
+      expect(list.length).toBeGreaterThanOrEqual(3);
     });
 
     it('should view any user', async () => {
@@ -67,9 +67,9 @@ describe('Users (e2e)', () => {
         .get(`/api/users/read/${user1Id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
-
-      expect(response.body.id).toBe(user1Id);
-      expect(response.body.email).toBe('user1@test.com');
+      const body = response.body as { id: string; email: string };
+      expect(body.id).toBe(user1Id);
+      expect(body.email).toBe('user1@test.com');
     });
 
     it('should create a new user', async () => {
@@ -83,9 +83,14 @@ describe('Users (e2e)', () => {
           role: 'USER',
         })
         .expect(201);
-
-      expect(response.body.email).toBe('newuser@test.com');
-      expect(response.body).not.toHaveProperty('password');
+      const created = response.body as { id: string; email: string } & Record<
+        string,
+        unknown
+      >;
+      expect(created.email).toBe('newuser@test.com');
+      expect(Object.prototype.hasOwnProperty.call(created, 'password')).toBe(
+        false,
+      );
     });
 
     it('should update any user', async () => {
@@ -94,8 +99,8 @@ describe('Users (e2e)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ name: 'User Two Updated' })
         .expect(200);
-
-      expect(response.body.name).toBe('User Two Updated');
+      const updated = response.body as { name: string };
+      expect(updated.name).toBe('User Two Updated');
     });
 
     it('should delete any user', async () => {
@@ -109,8 +114,8 @@ describe('Users (e2e)', () => {
           password: 'password123',
           role: 'USER',
         });
-
-      const userToDeleteId = createResponse.body.id;
+      const createdToDelete = createResponse.body as { id: string };
+      const userToDeleteId = createdToDelete.id;
 
       await request(app.getHttpServer())
         .delete(`/api/users/${userToDeleteId}`)
@@ -132,9 +137,9 @@ describe('Users (e2e)', () => {
         .get(`/api/users/read/${user1Id}`)
         .set('Authorization', `Bearer ${user1Token}`)
         .expect(200);
-
-      expect(response.body.id).toBe(user1Id);
-      expect(response.body.email).toBe('user1@test.com');
+      const me = response.body as { id: string; email: string };
+      expect(me.id).toBe(user1Id);
+      expect(me.email).toBe('user1@test.com');
     });
 
     it('should NOT view other users', async () => {
@@ -150,8 +155,8 @@ describe('Users (e2e)', () => {
         .set('Authorization', `Bearer ${user1Token}`)
         .send({ name: 'User One Updated' })
         .expect(200);
-
-      expect(response.body.name).toBe('User One Updated');
+      const updatedSelf = response.body as { name: string };
+      expect(updatedSelf.name).toBe('User One Updated');
     });
 
     it('should NOT update other users', async () => {
