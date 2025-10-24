@@ -1,6 +1,7 @@
 declare namespace Express {
   export interface Request {
     user: import('@prisma/client').User;
-    ability: import('../casl/ability.factory').AppAbility;
+    ability: import('../casl/policies.guard').AppAbility;
+    params: { id: string };
   }
 }

@@ -1,8 +1,20 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
+import { PolicyHandler } from './check-policies.decorator';
 import { Reflector } from '@nestjs/core';
 import { AbilityFactory } from './ability.factory';
 import { Request } from 'express';
+import { User } from '@prisma/client';
+import { MongoAbility, MongoQuery } from '@casl/ability';
+import { Action } from './action.enum';
 
+export type PermissionResource = Partial<User> | 'User';
+
+export type AppAbility = MongoAbility<[Action, PermissionResource], MongoQuery>;
 @Injectable()
 export class PoliciesGuard implements CanActivate {
   constructor(
@@ -11,11 +23,41 @@ export class PoliciesGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext) {
-    const request: Request = context.switchToHttp().getRequest();
+    const policyHandlers =
+      this.reflector.get<PolicyHandler[]>(
+        'check_policies',
+        context.getHandler(),
+      ) || [];
+
+    const request: Request & { user: User; params: { id: string } } = context
+      .switchToHttp()
+      .getRequest();
     const user = request.user;
     const ability = this.abilityFactory.createForUser(user);
     // attach ability to request for later decorators
     request.ability = ability;
+
+    const params = context.switchToHttp().getRequest().params;
+
+    const canActivate = policyHandlers.every((handler) =>
+      this.execPolicyHandler(handler, ability, params),
+    );
+
+    if (!canActivate) {
+      throw new ForbiddenException();
+    }
+
     return true;
+  }
+
+  private execPolicyHandler(
+    handler: PolicyHandler,
+    ability: AppAbility,
+    params: any,
+  ) {
+    if (typeof handler === 'function') {
+      return handler(ability, params);
+    }
+    return handler.handle(ability);
   }
 }

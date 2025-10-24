@@ -1,24 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   AbilityBuilder,
-  AbilityClass,
   ExtractSubjectType,
   InferSubjects,
-  PureAbility,
+  createMongoAbility,
 } from '@casl/ability';
 import { Injectable } from '@nestjs/common';
 import { Action } from './action.enum';
 import { User } from '@prisma/client';
+import { AppAbility } from './policies.guard';
 
-type Subjects = InferSubjects<'User'>;
-export type AppAbility = PureAbility<[Action, Subjects]>;
+type Subjects = InferSubjects<User | 'User'>;
 
 @Injectable()
 export class AbilityFactory {
   createForUser(user: User) {
-    const { can, cannot, build } = new AbilityBuilder<AppAbility>(
-      PureAbility as AbilityClass<AppAbility>,
-    );
+    const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
     if (user?.role === 'ADMIN') {
       can(Action.Manage, 'User');
@@ -28,7 +24,8 @@ export class AbilityFactory {
     }
 
     return build({
-      detectSubjectType: (item) => 'User' as ExtractSubjectType<Subjects>,
+      detectSubjectType: (subject) =>
+        subject.constructor.name as ExtractSubjectType<Subjects>,
     });
   }
 }
