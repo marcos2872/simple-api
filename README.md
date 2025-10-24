@@ -2,97 +2,277 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Simple API - NestJS with MCP & CASL
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+API REST com autenticação JWT, autorização CASL e integração Model Context Protocol (MCP) para execução de tools via SSE.
 
-## Description
+## 📋 Funcionalidades
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- ✅ **Autenticação JWT**: Sistema de login com tokens seguros
+- ✅ **Autorização CASL**: Controle granular de permissões baseado em roles (ADMIN/USER)
+- ✅ **MCP Integration**: Model Context Protocol com SSE para execução de tools
+- ✅ **API REST**: CRUD completo de usuários com validação de permissões
+- ✅ **Testes E2E**: Cobertura completa de testes de permissões
+- ✅ **Prisma ORM**: Banco de dados PostgreSQL com migrations
+- ✅ **Swagger/OpenAPI**: Documentação automática da API
 
-## Project setup
+## 🚀 Tecnologias
+
+- **NestJS** - Framework Node.js progressivo
+- **Prisma** - ORM moderno para TypeScript
+- **PostgreSQL** - Banco de dados relacional
+- **JWT** - JSON Web Tokens para autenticação
+- **CASL** - Biblioteca de autorização isomórfica
+- **@rekog/mcp-nest** - Model Context Protocol para NestJS
+- **Passport** - Middleware de autenticação
+- **Zod** - Validação de schemas TypeScript
+- **Swagger** - Documentação OpenAPI
+- **Jest** - Framework de testes
+
+## 📦 Instalação
+
+## 📦 Instalação
 
 ```bash
+# Instalar dependências
 $ pnpm install
+
+# Configurar variáveis de ambiente
+$ cp .env.example .env
+# Edite o arquivo .env com suas configurações
+
+# Executar migrations do banco de dados
+$ pnpm prisma migrate dev
+
+# (Opcional) Seed do banco com dados iniciais
+$ pnpm prisma db seed
 ```
 
-## Compile and run the project
+## ⚙️ Configuração
+
+### Variáveis de Ambiente
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/simple_api"
+
+# JWT
+JWT_SECRET="your-secret-key-here"
+JWT_EXPIRES_IN="7d"
+
+# Server
+PORT=3000
+```
+
+## 🏃 Executar o Projeto
+
+## 🏃 Executar o Projeto
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
+# Modo desenvolvimento (watch)
 $ pnpm run start:dev
 
-# production mode
+# Modo desenvolvimento
+$ pnpm run start
+
+# Modo produção
 $ pnpm run start:prod
 ```
 
-## Run tests
+O servidor estará disponível em: `http://localhost:3000/api`
+
+Documentação Swagger: `http://localhost:3000/api/docs`
+
+## 🧪 Testes
+
+## 🧪 Testes
 
 ```bash
-# unit tests
+# Testes unitários
 $ pnpm run test
 
-# e2e tests
-$ pnpm run test:e2e
+# Testes E2E (requer banco de dados de teste)
+$ pnpm test:e2e
 
-# test coverage
+# Cobertura de testes
 $ pnpm run test:cov
 ```
 
-## Deployment
+### Testes E2E
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Os testes validam todas as permissões CASL:
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+✓ ADMIN - Pode listar/criar/ler/atualizar/deletar usuários
+✓ USER - NÃO pode listar todos os usuários (403)
+✓ USER - Pode apenas ler/atualizar seu próprio perfil
+✓ USER - NÃO pode acessar outros usuários (403)
+✓ Autenticação - Rejeita requisições sem token (401)
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Veja mais em: [test/README.md](./test/README.md)
 
-## Resources
+## 📚 Documentação
 
-Check out a few resources that may come in handy when working with NestJS:
+### Sistema de Permissões CASL
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Documentação completa do sistema de autorização: [src/casl/README.md](./src/casl/README.md)
 
-## Support
+#### Roles e Permissões
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**ADMIN** - Acesso total:
 
-## Stay in touch
+- ✅ Todas as operações em Users (list, create, read, update, delete)
+- ✅ Todos os MCP tools sem restrições
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**USER** - Acesso limitado:
 
-## License
+- ✅ Ler e atualizar apenas seu próprio perfil
+- ✅ Executar MCP tools apenas com seu próprio ID
+- ❌ Listar todos os usuários
+- ❌ Criar ou deletar usuários
+- ❌ Acessar dados de outros usuários
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### API REST Endpoints
+
+#### Autenticação
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Resposta:**
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "email": "user@example.com",
+  "id": "uuid",
+  "role": "USER"
+}
+```
+
+#### Usuários
+
+Todas as rotas requerem autenticação via `Authorization: Bearer <token>`
+
+```http
+# Listar todos (apenas ADMIN)
+GET /api/users
+
+# Ver próprio perfil ou qualquer perfil (ADMIN)
+GET /api/users/read/:id
+
+# Criar usuário (apenas ADMIN)
+POST /api/users
+
+# Atualizar próprio perfil ou qualquer perfil (ADMIN)
+PATCH /api/users/:id
+
+# Deletar usuário (apenas ADMIN)
+DELETE /api/users/:id
+```
+
+### MCP (Model Context Protocol)
+
+#### Conexão SSE
+
+```http
+GET /api/sse
+Authorization: Bearer <token>
+```
+
+#### Tools Disponíveis
+
+O sistema expõe os seguintes tools via MCP:
+
+- `listUsers` - Listar todos os usuários (apenas ADMIN)
+- `getUser` - Obter usuário por ID (próprio ID ou ADMIN)
+- `getUserByEmail` - Obter usuário por email (próprio email ou ADMIN)
+- `createUser` - Criar novo usuário (apenas ADMIN)
+- `updateUser` - Atualizar usuário (próprio ID ou ADMIN)
+- `deleteUser` - Deletar usuário (apenas ADMIN)
+
+**Exemplo de chamada via MCP:**
+
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "getUser",
+    "arguments": {
+      "id": "user-uuid"
+    }
+  }
+}
+```
+
+## 🏗️ Estrutura do Projeto
+
+```
+src/
+├── auth/              # Autenticação JWT
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── jwt-auth.guard.ts
+│   └── jwt.strategy.ts
+├── casl/              # Sistema de autorização
+│   ├── ability.factory.ts      # Define permissões por role
+│   ├── policies.guard.ts       # Guard de validação
+│   ├── check-policies.decorator.ts
+│   ├── action.enum.ts
+│   └── README.md              # Documentação completa
+├── mcp/               # Model Context Protocol
+│   ├── controllers/
+│   │   └── mcp.controlle.ts   # Validação de tools
+│   └── mcp.module.ts
+├── users/             # CRUD de usuários
+│   ├── users.controller.ts    # REST endpoints
+│   ├── users.service.ts       # Business logic + @Tool decorators
+│   └── dto/
+├── prisma/            # Prisma ORM
+│   └── prisma.service.ts
+└── main.ts
+
+test/
+├── users.e2e-spec.ts  # Testes de permissões
+├── test-helper.ts     # Utilitários de teste
+└── README.md
+
+prisma/
+├── schema.prisma      # Schema do banco
+├── migrations/        # Migrations
+└── seed.ts           # Dados iniciais
+```
+
+## 🔐 Segurança
+
+- ✅ Autenticação via JWT com expiração configurável
+- ✅ Senhas hasheadas com bcrypt
+- ✅ Validação de permissões em todos os endpoints
+- ✅ Validação de schemas com Zod e class-validator
+- ✅ CORS configurável
+- ✅ Guards de autenticação e autorização
+- ✅ Validação de tools MCP antes da execução
+
+## 🤝 Contribuindo
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT.
+
+## 📧 Contato
+
+Para dúvidas ou suporte, abra uma issue no repositório.
