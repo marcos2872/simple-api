@@ -4,11 +4,30 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
+import { Tool } from '@rekog/mcp-nest';
+import { z } from 'zod';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  @Tool({
+    name: 'createUser',
+    description: 'Create a new user in the system',
+    parameters: z.object({
+      name: z.string().describe('User name'),
+      email: z.string().email().describe('User email address'),
+      password: z
+        .string()
+        .min(6)
+        .describe('User password (minimum 6 characters)'),
+      role: z
+        .enum(['ADMIN', 'USER'])
+        .default('USER')
+        .optional()
+        .describe('User role'),
+    }),
+  })
   async create(dto: CreateUserDto) {
     const hashed = await bcrypt.hash(dto.password, 10);
     const role = dto.role ?? Role.USER;
@@ -20,6 +39,11 @@ export class UsersService {
     return result;
   }
 
+  @Tool({
+    name: 'listUsers',
+    description: 'List all users in the system',
+    parameters: z.object({}),
+  })
   async findAll() {
     return this.prisma.user.findMany({
       select: {
@@ -33,6 +57,13 @@ export class UsersService {
     });
   }
 
+  @Tool({
+    name: 'getUser',
+    description: 'Get a specific user by ID',
+    parameters: z.object({
+      id: z.string().describe('User ID'),
+    }),
+  })
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -42,10 +73,28 @@ export class UsersService {
     return user;
   }
 
+  @Tool({
+    name: 'getUserByEmail',
+    description: 'Get a specific user by Email',
+    parameters: z.object({
+      id: z.string().email().describe('User Email'),
+    }),
+  })
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
+  @Tool({
+    name: 'updateUser',
+    description: 'Update an existing user',
+    parameters: z.object({
+      id: z.string().describe('User ID'),
+      name: z.string().optional().describe('Updated user name'),
+      email: z.string().email().optional().describe('Updated user email'),
+      password: z.string().min(6).optional().describe('Updated user password'),
+      role: z.enum(['ADMIN', 'USER']).optional().describe('Updated user role'),
+    }),
+  })
   async update(id: string, dto: UpdateUserDto) {
     if (dto.password) {
       dto.password = await bcrypt.hash(dto.password, 10);
@@ -57,6 +106,13 @@ export class UsersService {
     }
   }
 
+  @Tool({
+    name: 'deleteUser',
+    description: 'Delete a user by ID',
+    parameters: z.object({
+      id: z.string().describe('User ID to delete'),
+    }),
+  })
   async remove(id: string) {
     try {
       await this.prisma.user.delete({ where: { id } });

@@ -26,6 +26,14 @@ export class AuthService {
     return null;
   }
 
+  async loginTool(args: { email: string; password: string }) {
+    const user = await this.validateUser(args.email, args.password);
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+    return this.login(user);
+  }
+
   login(user: Partial<User>) {
     const payload = { sub: user.id, email: user.email, role: user.role };
     return {
