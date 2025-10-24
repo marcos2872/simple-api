@@ -52,7 +52,7 @@ export class UsersController {
     return ability.can(Action.Update, userSubject);
   })
   update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.usersService.update(id, dto);
+    return this.usersService.update({ id, ...dto });
   }
 
   @Delete('/:id')
@@ -61,6 +61,6 @@ export class UsersController {
     return ability.can(Action.Delete, userSubject);
   })
   remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+    return this.usersService.remove({ id });
   }
 }

@@ -77,10 +77,10 @@ export class UsersService {
     name: 'getUserByEmail',
     description: 'Get a specific user by Email',
     parameters: z.object({
-      id: z.string().email().describe('User Email'),
+      email: z.string().email().describe('User Email'),
     }),
   })
-  async findByEmail(email: string) {
+  async findByEmail({ email }: { email: string }) {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
@@ -95,7 +95,7 @@ export class UsersService {
       role: z.enum(['ADMIN', 'USER']).optional().describe('Updated user role'),
     }),
   })
-  async update(id: string, dto: UpdateUserDto) {
+  async update({ id, ...dto }: { id: string } & UpdateUserDto) {
     if (dto.password) {
       dto.password = await bcrypt.hash(dto.password, 10);
     }
@@ -113,7 +113,7 @@ export class UsersService {
       id: z.string().describe('User ID to delete'),
     }),
   })
-  async remove(id: string) {
+  async remove({ id }: { id: string }) {
     try {
       await this.prisma.user.delete({ where: { id } });
       return { deleted: true };
