@@ -1,7 +1,19 @@
-import { Body, Controller, Get, Post, Req, Res, Logger } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  Logger,
+  UseGuards,
+} from '@nestjs/common';
 import { McpSseService } from '@rekog/mcp-nest';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { PoliciesGuard } from 'src/casl/policies.guard';
 
 @Controller()
+@UseGuards(JwtAuthGuard, PoliciesGuard)
 export class CustomSseController {
   private readonly logger = new Logger(CustomSseController.name);
 

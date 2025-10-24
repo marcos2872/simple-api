@@ -3,13 +3,13 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { AbilityFactory } from './casl/ability.factory';
+import { CaslModule } from './casl/casl.module';
 import { McpSseModule } from './mcp/mcp.module';
 
 @Global()
 @Module({
-  imports: [ConfigModule, UsersModule, AuthModule, McpSseModule],
+  imports: [ConfigModule, UsersModule, AuthModule, CaslModule, McpSseModule],
   controllers: [],
-  providers: [AbilityFactory],
+  providers: [],
 })
 export class AppModule {}

@@ -64,7 +64,7 @@ export class UsersService {
       id: z.string().describe('User ID'),
     }),
   })
-  async findOne(id: string) {
+  async findOne({ id }: { id: string }) {
     const user = await this.prisma.user.findUnique({
       where: { id },
       omit: { password: true },
