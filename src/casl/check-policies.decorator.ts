@@ -1,10 +1,16 @@
 import { SetMetadata } from '@nestjs/common';
 import { AppAbility } from './policies.guard';
+import { User } from '@prisma/client';
+
 interface IPolicyHandler {
   handle(ability: AppAbility): boolean;
 }
 
-type PolicyHandlerCallback = (ability: AppAbility, params?: any) => boolean;
+type PolicyHandlerCallback = (
+  ability: AppAbility,
+  params?: any,
+  user?: User,
+) => boolean;
 
 export type PolicyHandler = IPolicyHandler | PolicyHandlerCallback;
 

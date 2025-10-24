@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -23,6 +24,8 @@ import { subject } from '@casl/ability';
 @Controller('users')
 @UseGuards(JwtAuthGuard, PoliciesGuard)
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
+
   constructor(private usersService: UsersService) {}
 
   @Post()
