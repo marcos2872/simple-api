@@ -1,8 +1,8 @@
 import { forwardRef, Global, Module } from '@nestjs/common';
 import { McpModule } from '@rekog/mcp-nest';
 import { CustomSseController } from './controllers/mcp.controlle';
-import { AuthModule } from 'src/auth/auth.module';
-import { CaslModule } from 'src/casl/casl.module';
+import { AuthModule } from '../auth/auth.module';
+import { CaslModule } from '../casl/casl.module';
 
 @Global()
 @Module({

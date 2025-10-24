@@ -10,15 +10,15 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { McpSseService } from '@rekog/mcp-nest';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { PoliciesGuard } from 'src/casl/policies.guard';
-import { CheckPolicies } from 'src/casl/check-policies.decorator';
-import { Action } from 'src/casl/action.enum';
-import { AppAbility } from 'src/casl/policies.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { PoliciesGuard } from '../../casl/policies.guard';
+import { CheckPolicies } from '../../casl/check-policies.decorator';
+import { Action } from '../../casl/action.enum';
+import { AppAbility } from '../../casl/policies.guard';
 import type { Request, Response } from 'express';
 import { User } from '@prisma/client';
 import { subject } from '@casl/ability';
-import { AbilityFactory } from 'src/casl/ability.factory';
+import { AbilityFactory } from '../../casl/ability.factory';
 
 // Mapeamento de tools MCP para ações CASL
 const TOOL_PERMISSIONS_MAP: Record<
