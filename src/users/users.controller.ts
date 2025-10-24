@@ -47,13 +47,19 @@ export class UsersController {
   }
 
   @Patch('/:id')
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Update, 'User'))
+  @CheckPolicies((ability: AppAbility, params: { id: string }) => {
+    const userSubject = subject('User', { id: params.id });
+    return ability.can(Action.Update, userSubject);
+  })
   update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
     return this.usersService.update(id, dto);
   }
 
   @Delete('/:id')
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, 'User'))
+  @CheckPolicies((ability: AppAbility, params: { id: string }) => {
+    const userSubject = subject('User', { id: params.id });
+    return ability.can(Action.Delete, userSubject);
+  })
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }

@@ -21,7 +21,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json --runInBand",
+    "test:e2e:setup": "dotenv -e .env.test -- prisma migrate deploy"
   },
   "dependencies": {
     "@casl/ability": "^6.7.3",
@@ -56,6 +57,7 @@
     "@types/node": "^24.9.1",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.3",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

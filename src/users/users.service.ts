@@ -12,9 +12,12 @@ export class UsersService {
   async create(dto: CreateUserDto) {
     const hashed = await bcrypt.hash(dto.password, 10);
     const role = dto.role ?? Role.USER;
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: { ...dto, password: hashed, role },
     });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
+    return result;
   }
 
   async findAll() {

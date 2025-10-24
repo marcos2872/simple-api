@@ -24,4 +24,4 @@ async function bootstrap() {
   Logger.log(`Server is running on  http://localhost:${PORT}/api`);
 }
 
-bootstrap();
+void bootstrap();
