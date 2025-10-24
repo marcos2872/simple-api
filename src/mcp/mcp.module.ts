@@ -6,7 +6,7 @@ import { CustomSseController } from './controllers/mcp.controlle';
 @Module({
   imports: [
     McpModule.forRoot({
-      name: 'mcp',
+      name: 'simple-api',
       version: '1.0.0',
       transport: [],
     }),

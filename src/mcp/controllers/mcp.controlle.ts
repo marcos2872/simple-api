@@ -9,8 +9,6 @@ export class CustomSseController {
 
   @Get('sse')
   async connectionSse(@Req() req: any, @Res() res: any): Promise<void> {
-    this.logger.log('SSE connection attempt');
-
     await this.mcpStreamableHttpService.createSseConnection(
       req,
       res,
@@ -25,7 +23,6 @@ export class CustomSseController {
     @Res() res: any,
     @Body() body: any,
   ): Promise<void> {
-    this.logger.log('Handling SSE message');
     await this.mcpStreamableHttpService.handleMessage(req, res, {
       ...body,
       // params: { ...body.params, user: req.user },
