@@ -10,7 +10,7 @@ API REST com autenticação JWT, autorização CASL e integração Model Context
 
 - ✅ **Autenticação JWT**: Sistema de login com tokens seguros
 - ✅ **Autorização CASL**: Controle granular de permissões baseado em roles (ADMIN/USER)
-- ✅ **MCP Integration**: Model Context Protocol com SSE para execução de tools
+- ✅ **MCP Integration**: Model Context Protocol completo com Tools, Resources e Prompts via SSE
 - ✅ **API REST**: CRUD completo de usuários com validação de permissões
 - ✅ **Testes E2E**: Cobertura completa de testes de permissões
 - ✅ **Prisma ORM**: Banco de dados PostgreSQL com migrations
@@ -181,11 +181,75 @@ DELETE /api/users/:id
 
 ### MCP (Model Context Protocol)
 
+O sistema implementa o protocolo MCP completo com três tipos de componentes:
+
+#### 1. Tools (Ferramentas)
+Executam ações no sistema de usuários:
+
+- `listUsers` - Listar todos os usuários (apenas ADMIN)
+- `getUser` - Obter usuário por ID (próprio ID ou ADMIN)
+- `getUserByEmail` - Obter usuário por email (próprio email ou ADMIN)
+- `createUser` - Criar novo usuário (apenas ADMIN)
+- `updateUser` - Atualizar usuário (próprio ID ou ADMIN)
+- `deleteUser` - Deletar usuário (apenas ADMIN)
+
+#### 2. Resources (Recursos)
+Fornecem acesso a dados estruturados:
+
+- `config://api/endpoints` - Lista de endpoints disponíveis na API
+- `config://casl/permissions` - Matriz de permissões CASL (ADMIN)
+- `docs://api/getting-started` - Guia de início da API
+- `docs://mcp/protocol` - Documentação do protocolo MCP
+- `stats://users/summary` - Estatísticas de usuários (ADMIN)
+- `schema://prisma/user` - Schema do modelo User
+- `schema://prisma/full` - Schema completo do Prisma (ADMIN)
+
+#### 3. Prompts (Templates)
+Templates para análise e relatórios:
+
+- `user-analysis` - Análise de padrões de usuários
+- `user-report` - Relatório abrangente de usuários  
+- `security-audit` - Auditoria de segurança (ADMIN)
+
 #### Conexão SSE
 
 ```http
 GET /api/sse
 Authorization: Bearer <token>
+```
+
+#### Executando Components
+
+**Tool:**
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "getUser",
+    "arguments": { "id": "user-uuid" }
+  }
+}
+```
+
+**Resource:**
+```json
+{
+  "method": "resources/read",
+  "params": {
+    "uri": "config://api/endpoints"
+  }
+}
+```
+
+**Prompt:**
+```json
+{
+  "method": "prompts/get",
+  "params": {
+    "name": "user-analysis",
+    "arguments": { "timeframe": "30d" }
+  }
+}
 ```
 
 #### Testando com MCP Inspector
@@ -206,9 +270,9 @@ $ npx @modelcontextprotocol/inspector sse://localhost:3000/api/sse
 O MCP Inspector irá abrir uma interface web onde você pode:
 
 1. **Fazer login** - Use as credenciais de teste (veja seed.ts)
-2. **Explorar tools** - Ver todos os tools disponíveis baseados nas suas permissões
-3. **Executar tools** - Testar chamadas interativamente
-4. **Ver respostas** - Verificar retornos e validações de permissão
+2. **Explorar componentes** - Ver todos os tools, resources e prompts disponíveis
+3. **Executar interativamente** - Testar chamadas com validação de permissões
+4. **Ver respostas** - Verificar retornos e formatação
 
 **Credenciais de teste (após executar seed):**
 
@@ -220,34 +284,9 @@ O MCP Inspector irá abrir uma interface web onde você pode:
 }
 
 {
-  "email": "user@example.com",
+  "email": "user@example.com", 
   "password": "user123",
   "role": "USER"
-}
-```
-
-#### Tools Disponíveis
-
-O sistema expõe os seguintes tools via MCP:
-
-- `listUsers` - Listar todos os usuários (apenas ADMIN)
-- `getUser` - Obter usuário por ID (próprio ID ou ADMIN)
-- `getUserByEmail` - Obter usuário por email (próprio email ou ADMIN)
-- `createUser` - Criar novo usuário (apenas ADMIN)
-- `updateUser` - Atualizar usuário (próprio ID ou ADMIN)
-- `deleteUser` - Deletar usuário (apenas ADMIN)
-
-**Exemplo de chamada via MCP:**
-
-```json
-{
-  "method": "tools/call",
-  "params": {
-    "name": "getUser",
-    "arguments": {
-      "id": "user-uuid"
-    }
-  }
 }
 ```
 
@@ -268,8 +307,12 @@ src/
 │   └── README.md              # Documentação completa
 ├── mcp/               # Model Context Protocol
 │   ├── controllers/
-│   │   └── mcp.controlle.ts   # Validação de tools
-│   └── mcp.module.ts
+│   │   └── mcp.controlle.ts   # Validação MCP com permissões
+│   ├── services/
+│   │   ├── resources.service.ts   # Resources MCP
+│   │   └── prompts.service.ts     # Prompts MCP
+│   ├── mcp.module.ts
+│   └── README.md              # Documentação MCP
 ├── users/             # CRUD de usuários
 │   ├── users.controller.ts    # REST endpoints
 │   ├── users.service.ts       # Business logic + @Tool decorators

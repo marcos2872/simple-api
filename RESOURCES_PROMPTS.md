@@ -1,14 +1,52 @@
 # Resources e Prompts no Servidor MCP
 
-Este documento explica como implementamos **Resources** e **Prompts** no servidor MCP do projeto Simple API.
+Este documento explica como implementamos **Resources** e **Prompts** no servidor MCP do projeto Simple API, incluindo correções de formato e validações de permissão.
 
 ## Overview
 
 O Model Context Protocol (MCP) suporta três tipos principais de componentes:
 
-1. **Tools**: Funções que podem ser executadas (já implementado no `UsersService`)
-2. **Resources**: Dados estáticos ou dinâmicos que podem ser acessados
-3. **Prompts**: Templates para geração de conteúdo ou análises
+1. **Tools**: Funções que podem ser executadas (implementado no `UsersService`)
+2. **Resources**: Dados estáticos ou dinâmicos que podem ser acessados ✨ **IMPLEMENTADO**
+3. **Prompts**: Templates para geração de conteúdo ou análises ✨ **IMPLEMENTADO**
+
+## Arquitetura da Implementação
+
+### Estrutura de Arquivos
+
+```
+src/mcp/
+├── controllers/
+│   └── mcp.controlle.ts           # Controller SSE com validação de permissões
+├── services/
+│   ├── resources.service.ts       # Implementação dos Resources
+│   └── prompts.service.ts         # Implementação dos Prompts
+├── mcp.module.ts                  # Configuração do módulo
+└── README.md                      # Documentação específica do MCP
+```
+
+### Fluxo de Validação
+
+1. **Autenticação JWT**: Token validado no SSE
+2. **Permissão MCP**: Usuário deve ter acesso ao MCP
+3. **Validação Específica**: Cada resource/prompt tem suas próprias regras
+4. **Execução**: Component é executado e retornado
+
+## Resources Implementados
+
+Os Resources fornecem acesso a dados e documentação através de URIs específicos, retornando no formato padrão MCP:
+
+```typescript
+{
+  contents: [
+    {
+      uri: string,
+      mimeType: string,
+      text: string
+    }
+  ]
+}
+```
 
 ## Resources Implementados
 
@@ -22,33 +60,87 @@ src/mcp/services/resources.service.ts
 
 ### Resources Disponíveis
 
-#### 1. Schemas Prisma
+#### 1. Schemas do Banco de Dados
 
+**📄 Schema do User**
 - **URI**: `schema://prisma/user`
-- **Descrição**: Schema do modelo User
-- **Permissão**: Público (todos os usuários autenticados)
+- **Descrição**: Schema do modelo User do Prisma
+- **Mime Type**: `text/plain`
+- **Permissão**: 🟢 Público (todos os usuários autenticados)
+- **Conteúdo**: Schema Prisma específico do model User
 
+**📄 Schema Completo**
 - **URI**: `schema://prisma/full`
 - **Descrição**: Schema completo do Prisma
-- **Permissão**: Admin apenas
+- **Mime Type**: `text/plain`
+- **Permissão**: 🔴 Admin apenas
+- **Conteúdo**: Arquivo `schema.prisma` completo
 
 #### 2. Configurações da API
 
+**⚙️ Endpoints da API**
 - **URI**: `config://api/endpoints`
-- **Descrição**: Documentação dos endpoints da API
-- **Permissão**: Público
+- **Descrição**: Lista completa de endpoints disponíveis
+- **Mime Type**: `application/json`
+- **Permissão**: 🟢 Público
+- **Conteúdo**: JSON estruturado com todos os endpoints, métodos, permissões e exemplos
 
+**⚙️ Matriz de Permissões CASL**
 - **URI**: `config://casl/permissions`
-- **Descrição**: Matriz de permissões CASL
-- **Permissão**: Admin apenas
+- **Descrição**: Mapeamento completo de permissões por role
+- **Mime Type**: `application/json`
+- **Permissão**: 🔴 Admin apenas
+- **Conteúdo**: Estrutura detalhada das permissões ADMIN vs USER
 
-#### 3. Estatísticas
+#### 3. Estatísticas do Sistema
 
+**📊 Resumo de Usuários**
 - **URI**: `stats://users/summary`
-- **Descrição**: Estatísticas dos usuários
-- **Permissão**: Admin apenas
+- **Descrição**: Estatísticas gerais dos usuários
+- **Mime Type**: `application/json`
+- **Permissão**: 🔴 Admin apenas
+- **Conteúdo**: Contadores, distribuição por role, métricas de crescimento
 
-#### 4. Documentação
+**📚 Guia de Início**
+- **URI**: `docs://api/getting-started`
+- **Descrição**: Tutorial passo-a-passo para usar a API
+- **Mime Type**: `text/markdown`
+- **Permissão**: 🟢 Público
+- **Conteúdo**: Guia completo com autenticação, endpoints, exemplos de código
+
+**📚 Documentação MCP**
+- **URI**: `docs://mcp/protocol`
+- **Descrição**: Documentação detalhada da implementação MCP
+- **Mime Type**: `text/markdown`
+- **Permissão**: 🟢 Público
+- **Conteúdo**: Arquitetura, fluxos, exemplos, melhores práticas
+
+### Exemplo de Uso de Resource
+
+```bash
+curl -X POST http://localhost:3000/api/messages \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "method": "resources/read",
+    "params": {
+      "uri": "config://api/endpoints"
+    }
+  }'
+```
+
+**Resposta:**
+```json
+{
+  "contents": [
+    {
+      "uri": "config://api/endpoints",
+      "mimeType": "application/json",
+      "text": "{\n  \"auth\": {\n    \"login\": {\n      \"method\": \"POST\",\n      \"path\": \"/api/auth/login\",\n      \"description\": \"Authenticate user and get JWT token\"\n    }\n  },\n  \"users\": {\n    ...\n  }\n}"
+    }
+  ]
+}
+```
 
 - **URI**: `docs://api/getting-started`
 - **Descrição**: Guia de início rápido da API
@@ -71,7 +163,21 @@ src/mcp/services/resources.service.ts
 
 ## Prompts Implementados
 
-Os Prompts fornecem templates para geração de análises e relatórios.
+Os Prompts fornecem templates para análises e relatórios de IA, retornando no formato padrão MCP:
+
+```typescript
+{
+  messages: [
+    {
+      role: 'user',
+      content: {
+        type: 'text',
+        text: string  // Template processado
+      }
+    }
+  ]
+}
+```
 
 ### Localização
 
@@ -81,41 +187,134 @@ src/mcp/services/prompts.service.ts
 
 ### Prompts Disponíveis
 
-#### 1. user-analysis
+#### 🔍 Análise de Usuários
 
-- **Descrição**: Analisa padrões e comportamento de usuários
+**Prompt**: `user-analysis`
+- **Descrição**: Gera templates para análise de padrões e comportamento de usuários
+- **Permissão**: 🟢 Público (dados filtrados por contexto do usuário)
 - **Parâmetros**:
-  - `userId` (opcional): ID específico do usuário
-  - `timeframe` (opcional): Período de análise (7d, 30d, 90d, 1y)
-  - `includeMetrics` (opcional): Incluir métricas detalhadas
-- **Permissão**: Público
+  - `userId` (opcional): ID específico do usuário para análise individual
+  - `timeframe` (opcional): Período de análise - `7d`, `30d`, `90d`, `1y` (padrão: `30d`)
+  - `includeMetrics` (opcional): Incluir métricas detalhadas - `true`/`false` (padrão: `true`)
 
-#### 2. user-report
+**Funcionalidades:**
+- Análise individual com dados específicos do usuário
+- Análise geral do sistema com estatísticas agregadas
+- Cálculo automático de métricas de crescimento
+- Geração de questões de análise contextual
 
-- **Descrição**: Gera relatório abrangente de usuários
+#### 📊 Relatório de Usuários
+
+**Prompt**: `user-report`
+- **Descrição**: Gera templates para relatórios abrangentes de usuários
+- **Permissão**: 🟢 Público (dados filtrados por contexto do usuário)
 - **Parâmetros**:
-  - `userId` (opcional): ID específico do usuário
-  - `format` (opcional): Formato do relatório (summary, detailed, technical)
-  - `includePermissions` (opcional): Incluir análise de permissões
-- **Permissão**: Público
+  - `userId` (opcional): ID específico do usuário para relatório individual
+  - `format` (opcional): Formato do relatório - `summary`, `detailed`, `technical` (padrão: `summary`)
+  - `includePermissions` (opcional): Incluir análise de permissões - `true`/`false` (padrão: `false`)
 
-#### 3. security-audit
+**Funcionalidades:**
+- Relatórios individuais com perfil completo
+- Relatórios sistema-wide com distribuição de usuários
+- Múltiplos formatos de saída
+- Análise de permissões opcional
 
-- **Descrição**: Gera prompt para auditoria de segurança
+#### 🛡️ Auditoria de Segurança
+
+**Prompt**: `security-audit`
+- **Descrição**: Gera templates para auditoria de segurança do sistema
+- **Permissão**: 🔴 Admin apenas
 - **Parâmetros**:
-  - `scope` (opcional): Escopo da auditoria (users, permissions, full)
-  - `severity` (opcional): Nível mínimo de severidade (low, medium, high, critical)
-- **Permissão**: Admin apenas
+  - `scope` (opcional): Escopo da auditoria - `users`, `permissions`, `full` (padrão: `full`)
+  - `severity` (opcional): Nível mínimo - `low`, `medium`, `high`, `critical` (padrão: `medium`)
 
-### Exemplo de Uso
+**Funcionalidades:**
+- Análise de distribuição de contas admin
+- Auditoria de estrutura de permissões
+- Recomendações de segurança
+- Identificação de riscos potenciais
 
+### Exemplo de Uso de Prompt
+
+```bash
+curl -X POST http://localhost:3000/api/messages \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "method": "prompts/get",
+    "params": {
+      "name": "user-analysis",
+      "arguments": {
+        "userId": "user_123",
+        "timeframe": "30d",
+        "includeMetrics": "true"
+      }
+    }
+  }'
+```
+
+**Resposta:**
 ```json
 {
-  "method": "prompts/get",
-  "params": {
-    "name": "user-analysis",
-    "arguments": {
-      "userId": "user_123",
+  "messages": [
+    {
+      "role": "user",
+      "content": {
+        "type": "text",
+        "text": "# User Analysis Report\n\n## Analysis Parameters\n- **Timeframe**: 30d (last 30 days)\n- **Date Range**: 25/09/2025 to 25/10/2025\n- **Include Metrics**: true\n\n## Instructions for AI Assistant\n\nYou are analyzing user data from our application...\n\n### Single User Analysis: John Doe\n\n**User Details:**\n- ID: user_123\n- Email: john@example.com\n- Role: USER\n- Account Created: 15/09/2025\n- Last Updated: 20/10/2025\n- Account Age: 40 days\n\n**Analysis Questions:**\n1. How active has this user been based on their account age?\n2. What insights can you provide about their role and permissions?\n3. Are there any patterns in their account updates?\n4. What recommendations would you make for user engagement?\n\n## Output Format\n\nPlease structure your analysis as follows:\n\n1. **Executive Summary** - Key findings in 2-3 sentences\n2. **Detailed Insights** - Answer the analysis questions above\n3. **Trends and Patterns** - What patterns do you observe?\n4. **Recommendations** - Specific, actionable recommendations\n5. **Risk Assessment** - Any potential concerns or risks identified\n\nUse clear headings and bullet points for readability."
+      }
+    }
+  ]
+}
+```
+
+## Correções de Formato Implementadas
+
+### Problema Inicial
+
+Originalmente, tanto Resources quanto Prompts estavam retornando strings diretamente:
+
+```typescript
+// ❌ INCORRETO - Retornava string vazia no cliente
+return JSON.stringify(data, null, 2);
+return promptText;
+```
+
+### Solução Implementada
+
+Ajustamos para retornar os formatos esperados pelo protocolo MCP:
+
+#### Resources
+
+```typescript
+// ✅ CORRETO - Formato MCP Resource
+return {
+  contents: [
+    {
+      uri: 'config://api/endpoints',
+      mimeType: 'application/json',
+      text: JSON.stringify(data, null, 2)
+    }
+  ]
+};
+```
+
+#### Prompts
+
+```typescript
+// ✅ CORRETO - Formato MCP Prompt
+return {
+  messages: [
+    {
+      role: 'user',
+      content: {
+        type: 'text',
+        text: promptText
+      }
+    }
+  ]
+};
+```
       "timeframe": "30d",
       "includeMetrics": "true"
     }

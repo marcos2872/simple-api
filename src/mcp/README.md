@@ -1,6 +1,15 @@
 # Módulo MCP (Model Context Protocol)
 
-Este módulo implementa o Model Context Protocol para fornecer acesso estruturado e seguro ao sistema de gerenciamento de usuários.
+Este módulo implementa o protocolo MCP completo para fornecer acesso estruturado e seguro ao sistema de gerenciamento de usuários através de Tools, Resources e Prompts.
+
+## Status da Implementação
+
+- ✅ **Tools**: Operações CRUD no sistema de usuários
+- ✅ **Resources**: Acesso a dados, configurações e documentação  
+- ✅ **Prompts**: Templates para análise e relatórios
+- ✅ **Autenticação**: JWT + SSE com validação contínua
+- ✅ **Autorização**: Sistema CASL com permissões granulares
+- ✅ **Formato MCP**: Retornos padronizados conforme protocolo
 
 ## Estrutura do Módulo
 
@@ -29,29 +38,86 @@ Implementado no `UsersService` (`src/users/users.service.ts`)
 - `updateUser` - Atualizar usuário (próprio perfil ou ADMIN)
 - `deleteUser` - Deletar usuário (ADMIN apenas)
 
-### 2. Resources (Recursos)
+### 2. Resources (Recursos) ✨
 
-Implementado no `ResourcesService`
+Implementado no `ResourcesService` - Fornecem dados estruturados
 
-**Disponíveis:**
+**📄 Schemas:**
+- `schema://prisma/user` - Schema do modelo User (🟢 Público)
+- `schema://prisma/full` - Schema completo do Prisma (🔴 ADMIN)
 
-- `schema://prisma/user` - Schema do modelo User
-- `schema://prisma/full` - Schema completo do Prisma (ADMIN)
-- `config://api/endpoints` - Documentação dos endpoints
-- `config://casl/permissions` - Matriz de permissões (ADMIN)
-- `stats://users/summary` - Estatísticas de usuários (ADMIN)
-- `docs://api/getting-started` - Guia de início
-- `docs://mcp/protocol` - Documentação do protocolo MCP
+**⚙️ Configurações:**
+- `config://api/endpoints` - Documentação completa dos endpoints (🟢 Público)
+- `config://casl/permissions` - Matriz de permissões CASL (🔴 ADMIN)
 
-### 3. Prompts (Templates)
+**📊 Estatísticas:**
+- `stats://users/summary` - Métricas e estatísticas de usuários (🔴 ADMIN)
 
-Implementado no `PromptsService`
+**📚 Documentação:**
+- `docs://api/getting-started` - Guia de início da API (🟢 Público)
+- `docs://mcp/protocol` - Documentação do protocolo MCP (🟢 Público)
 
-**Disponíveis:**
+### 3. Prompts (Templates) ✨
 
-- `user-analysis` - Análise de padrões de usuários
-- `user-report` - Relatório abrangente de usuários
-- `security-audit` - Auditoria de segurança (ADMIN)
+Implementado no `PromptsService` - Templates para análise e relatórios
+
+**🔍 Análise:**
+- `user-analysis` - Análise de padrões de usuários com métricas (🟢 Público)
+
+**📊 Relatórios:**
+- `user-report` - Relatório abrangente de usuários (🟢 Público)
+
+**🛡️ Segurança:**
+- `security-audit` - Auditoria de segurança do sistema (🔴 ADMIN)
+
+## Correções de Formato Implementadas
+
+### Problema Resolvido
+
+Os Resources e Prompts retornavam strings vazias ao cliente devido ao formato incorreto de retorno.
+
+**Antes (❌ Incorreto):**
+```typescript
+// Resources retornavam apenas strings
+return JSON.stringify(data);
+
+// Prompts retornavam apenas strings  
+return promptText;
+```
+
+**Depois (✅ Correto):**
+```typescript
+// Resources seguem formato MCP
+return {
+  contents: [
+    {
+      uri: 'config://api/endpoints',
+      mimeType: 'application/json',
+      text: JSON.stringify(data, null, 2)
+    }
+  ]
+};
+
+// Prompts seguem formato MCP
+return {
+  messages: [
+    {
+      role: 'user',
+      content: {
+        type: 'text',
+        text: promptText
+      }
+    }
+  ]
+};
+```
+
+### Resultado
+
+- ✅ Resources agora retornam conteúdo completo estruturado
+- ✅ Prompts agora retornam templates processados corretamente
+- ✅ Compatibilidade total com protocolo MCP
+- ✅ Logs mostram dados sendo processados corretamente
 
 ## Autenticação e Autorização
 
