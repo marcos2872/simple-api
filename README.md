@@ -184,6 +184,7 @@ DELETE /api/users/:id
 O sistema implementa o protocolo MCP completo com três tipos de componentes:
 
 #### 1. Tools (Ferramentas)
+
 Executam ações no sistema de usuários:
 
 - `listUsers` - Listar todos os usuários (apenas ADMIN)
@@ -194,6 +195,7 @@ Executam ações no sistema de usuários:
 - `deleteUser` - Deletar usuário (apenas ADMIN)
 
 #### 2. Resources (Recursos)
+
 Fornecem acesso a dados estruturados:
 
 - `config://api/endpoints` - Lista de endpoints disponíveis na API
@@ -205,10 +207,11 @@ Fornecem acesso a dados estruturados:
 - `schema://prisma/full` - Schema completo do Prisma (ADMIN)
 
 #### 3. Prompts (Templates)
+
 Templates para análise e relatórios:
 
 - `user-analysis` - Análise de padrões de usuários
-- `user-report` - Relatório abrangente de usuários  
+- `user-report` - Relatório abrangente de usuários
 - `security-audit` - Auditoria de segurança (ADMIN)
 
 #### Conexão SSE
@@ -221,6 +224,7 @@ Authorization: Bearer <token>
 #### Executando Components
 
 **Tool:**
+
 ```json
 {
   "method": "tools/call",
@@ -232,6 +236,7 @@ Authorization: Bearer <token>
 ```
 
 **Resource:**
+
 ```json
 {
   "method": "resources/read",
@@ -242,6 +247,7 @@ Authorization: Bearer <token>
 ```
 
 **Prompt:**
+
 ```json
 {
   "method": "prompts/get",
@@ -284,7 +290,7 @@ O MCP Inspector irá abrir uma interface web onde você pode:
 }
 
 {
-  "email": "user@example.com", 
+  "email": "user@example.com",
   "password": "user123",
   "role": "USER"
 }

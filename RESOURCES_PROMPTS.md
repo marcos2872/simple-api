@@ -42,9 +42,9 @@ Os Resources fornecem acesso a dados e documentação através de URIs específi
     {
       uri: string,
       mimeType: string,
-      text: string
-    }
-  ]
+      text: string,
+    },
+  ];
 }
 ```
 
@@ -63,6 +63,7 @@ src/mcp/services/resources.service.ts
 #### 1. Schemas do Banco de Dados
 
 **📄 Schema do User**
+
 - **URI**: `schema://prisma/user`
 - **Descrição**: Schema do modelo User do Prisma
 - **Mime Type**: `text/plain`
@@ -70,6 +71,7 @@ src/mcp/services/resources.service.ts
 - **Conteúdo**: Schema Prisma específico do model User
 
 **📄 Schema Completo**
+
 - **URI**: `schema://prisma/full`
 - **Descrição**: Schema completo do Prisma
 - **Mime Type**: `text/plain`
@@ -79,6 +81,7 @@ src/mcp/services/resources.service.ts
 #### 2. Configurações da API
 
 **⚙️ Endpoints da API**
+
 - **URI**: `config://api/endpoints`
 - **Descrição**: Lista completa de endpoints disponíveis
 - **Mime Type**: `application/json`
@@ -86,6 +89,7 @@ src/mcp/services/resources.service.ts
 - **Conteúdo**: JSON estruturado com todos os endpoints, métodos, permissões e exemplos
 
 **⚙️ Matriz de Permissões CASL**
+
 - **URI**: `config://casl/permissions`
 - **Descrição**: Mapeamento completo de permissões por role
 - **Mime Type**: `application/json`
@@ -95,6 +99,7 @@ src/mcp/services/resources.service.ts
 #### 3. Estatísticas do Sistema
 
 **📊 Resumo de Usuários**
+
 - **URI**: `stats://users/summary`
 - **Descrição**: Estatísticas gerais dos usuários
 - **Mime Type**: `application/json`
@@ -102,6 +107,7 @@ src/mcp/services/resources.service.ts
 - **Conteúdo**: Contadores, distribuição por role, métricas de crescimento
 
 **📚 Guia de Início**
+
 - **URI**: `docs://api/getting-started`
 - **Descrição**: Tutorial passo-a-passo para usar a API
 - **Mime Type**: `text/markdown`
@@ -109,6 +115,7 @@ src/mcp/services/resources.service.ts
 - **Conteúdo**: Guia completo com autenticação, endpoints, exemplos de código
 
 **📚 Documentação MCP**
+
 - **URI**: `docs://mcp/protocol`
 - **Descrição**: Documentação detalhada da implementação MCP
 - **Mime Type**: `text/markdown`
@@ -130,6 +137,7 @@ curl -X POST http://localhost:3000/api/messages \
 ```
 
 **Resposta:**
+
 ```json
 {
   "contents": [
@@ -172,10 +180,10 @@ Os Prompts fornecem templates para análises e relatórios de IA, retornando no 
       role: 'user',
       content: {
         type: 'text',
-        text: string  // Template processado
-      }
-    }
-  ]
+        text: string, // Template processado
+      },
+    },
+  ];
 }
 ```
 
@@ -190,6 +198,7 @@ src/mcp/services/prompts.service.ts
 #### 🔍 Análise de Usuários
 
 **Prompt**: `user-analysis`
+
 - **Descrição**: Gera templates para análise de padrões e comportamento de usuários
 - **Permissão**: 🟢 Público (dados filtrados por contexto do usuário)
 - **Parâmetros**:
@@ -198,6 +207,7 @@ src/mcp/services/prompts.service.ts
   - `includeMetrics` (opcional): Incluir métricas detalhadas - `true`/`false` (padrão: `true`)
 
 **Funcionalidades:**
+
 - Análise individual com dados específicos do usuário
 - Análise geral do sistema com estatísticas agregadas
 - Cálculo automático de métricas de crescimento
@@ -206,6 +216,7 @@ src/mcp/services/prompts.service.ts
 #### 📊 Relatório de Usuários
 
 **Prompt**: `user-report`
+
 - **Descrição**: Gera templates para relatórios abrangentes de usuários
 - **Permissão**: 🟢 Público (dados filtrados por contexto do usuário)
 - **Parâmetros**:
@@ -214,6 +225,7 @@ src/mcp/services/prompts.service.ts
   - `includePermissions` (opcional): Incluir análise de permissões - `true`/`false` (padrão: `false`)
 
 **Funcionalidades:**
+
 - Relatórios individuais com perfil completo
 - Relatórios sistema-wide com distribuição de usuários
 - Múltiplos formatos de saída
@@ -222,6 +234,7 @@ src/mcp/services/prompts.service.ts
 #### 🛡️ Auditoria de Segurança
 
 **Prompt**: `security-audit`
+
 - **Descrição**: Gera templates para auditoria de segurança do sistema
 - **Permissão**: 🔴 Admin apenas
 - **Parâmetros**:
@@ -229,6 +242,7 @@ src/mcp/services/prompts.service.ts
   - `severity` (opcional): Nível mínimo - `low`, `medium`, `high`, `critical` (padrão: `medium`)
 
 **Funcionalidades:**
+
 - Análise de distribuição de contas admin
 - Auditoria de estrutura de permissões
 - Recomendações de segurança
@@ -254,6 +268,7 @@ curl -X POST http://localhost:3000/api/messages \
 ```
 
 **Resposta:**
+
 ```json
 {
   "messages": [
@@ -293,9 +308,9 @@ return {
     {
       uri: 'config://api/endpoints',
       mimeType: 'application/json',
-      text: JSON.stringify(data, null, 2)
-    }
-  ]
+      text: JSON.stringify(data, null, 2),
+    },
+  ],
 };
 ```
 
@@ -309,18 +324,21 @@ return {
       role: 'user',
       content: {
         type: 'text',
-        text: promptText
-      }
-    }
-  ]
+        text: promptText,
+      },
+    },
+  ],
 };
 ```
+
       "timeframe": "30d",
       "includeMetrics": "true"
     }
-  }
+
 }
-```
+}
+
+````
 
 ## Sistema de Permissões
 
@@ -345,7 +363,7 @@ const RESOURCE_PERMISSIONS_MAP = {
   'docs://api/getting-started': { action: Action.Access },
   'docs://mcp/protocol': { action: Action.Access },
 };
-```
+````
 
 #### Prompts
 

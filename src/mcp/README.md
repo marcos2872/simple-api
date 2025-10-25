@@ -5,7 +5,7 @@ Este módulo implementa o protocolo MCP completo para fornecer acesso estruturad
 ## Status da Implementação
 
 - ✅ **Tools**: Operações CRUD no sistema de usuários
-- ✅ **Resources**: Acesso a dados, configurações e documentação  
+- ✅ **Resources**: Acesso a dados, configurações e documentação
 - ✅ **Prompts**: Templates para análise e relatórios
 - ✅ **Autenticação**: JWT + SSE com validação contínua
 - ✅ **Autorização**: Sistema CASL com permissões granulares
@@ -43,17 +43,21 @@ Implementado no `UsersService` (`src/users/users.service.ts`)
 Implementado no `ResourcesService` - Fornecem dados estruturados
 
 **📄 Schemas:**
+
 - `schema://prisma/user` - Schema do modelo User (🟢 Público)
 - `schema://prisma/full` - Schema completo do Prisma (🔴 ADMIN)
 
 **⚙️ Configurações:**
+
 - `config://api/endpoints` - Documentação completa dos endpoints (🟢 Público)
 - `config://casl/permissions` - Matriz de permissões CASL (🔴 ADMIN)
 
 **📊 Estatísticas:**
+
 - `stats://users/summary` - Métricas e estatísticas de usuários (🔴 ADMIN)
 
 **📚 Documentação:**
+
 - `docs://api/getting-started` - Guia de início da API (🟢 Público)
 - `docs://mcp/protocol` - Documentação do protocolo MCP (🟢 Público)
 
@@ -62,12 +66,15 @@ Implementado no `ResourcesService` - Fornecem dados estruturados
 Implementado no `PromptsService` - Templates para análise e relatórios
 
 **🔍 Análise:**
+
 - `user-analysis` - Análise de padrões de usuários com métricas (🟢 Público)
 
 **📊 Relatórios:**
+
 - `user-report` - Relatório abrangente de usuários (🟢 Público)
 
 **🛡️ Segurança:**
+
 - `security-audit` - Auditoria de segurança do sistema (🔴 ADMIN)
 
 ## Correções de Formato Implementadas
@@ -77,15 +84,17 @@ Implementado no `PromptsService` - Templates para análise e relatórios
 Os Resources e Prompts retornavam strings vazias ao cliente devido ao formato incorreto de retorno.
 
 **Antes (❌ Incorreto):**
+
 ```typescript
 // Resources retornavam apenas strings
 return JSON.stringify(data);
 
-// Prompts retornavam apenas strings  
+// Prompts retornavam apenas strings
 return promptText;
 ```
 
 **Depois (✅ Correto):**
+
 ```typescript
 // Resources seguem formato MCP
 return {
@@ -93,9 +102,9 @@ return {
     {
       uri: 'config://api/endpoints',
       mimeType: 'application/json',
-      text: JSON.stringify(data, null, 2)
-    }
-  ]
+      text: JSON.stringify(data, null, 2),
+    },
+  ],
 };
 
 // Prompts seguem formato MCP
@@ -105,10 +114,10 @@ return {
       role: 'user',
       content: {
         type: 'text',
-        text: promptText
-      }
-    }
-  ]
+        text: promptText,
+      },
+    },
+  ],
 };
 ```
 
