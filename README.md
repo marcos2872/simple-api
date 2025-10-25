@@ -188,6 +188,44 @@ GET /api/sse
 Authorization: Bearer <token>
 ```
 
+#### Testando com MCP Inspector
+
+Para testar o MCP server interativamente, você pode usar o MCP Inspector:
+
+```bash
+# Instalar o MCP Inspector globalmente
+$ npm install -g @modelcontextprotocol/inspector
+
+# Executar o servidor da API (em um terminal)
+$ pnpm run start:dev
+
+# Em outro terminal, executar o MCP Inspector
+$ npx @modelcontextprotocol/inspector sse://localhost:3000/api/sse
+```
+
+O MCP Inspector irá abrir uma interface web onde você pode:
+
+1. **Fazer login** - Use as credenciais de teste (veja seed.ts)
+2. **Explorar tools** - Ver todos os tools disponíveis baseados nas suas permissões
+3. **Executar tools** - Testar chamadas interativamente
+4. **Ver respostas** - Verificar retornos e validações de permissão
+
+**Credenciais de teste (após executar seed):**
+
+```json
+{
+  "email": "admin@example.com",
+  "password": "admin123",
+  "role": "ADMIN"
+}
+
+{
+  "email": "user@example.com",
+  "password": "user123",
+  "role": "USER"
+}
+```
+
 #### Tools Disponíveis
 
 O sistema expõe os seguintes tools via MCP:
