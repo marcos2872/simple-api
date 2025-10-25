@@ -33,6 +33,30 @@ const TOOL_PERMISSIONS_MAP: Record<
   deleteUser: { action: Action.Delete, resource: 'User', requiresId: true },
 };
 
+// Mapeamento de recursos MCP para permissões CASL
+const RESOURCE_PERMISSIONS_MAP: Record<
+  string,
+  { action: Action; adminOnly?: boolean }
+> = {
+  'schema://prisma/user': { action: Action.Access },
+  'schema://prisma/full': { action: Action.Access, adminOnly: true },
+  'config://api/endpoints': { action: Action.Access },
+  'config://casl/permissions': { action: Action.Access, adminOnly: true },
+  'stats://users/summary': { action: Action.Access, adminOnly: true },
+  'docs://api/getting-started': { action: Action.Access },
+  'docs://mcp/protocol': { action: Action.Access },
+};
+
+// Mapeamento de prompts MCP para permissões CASL
+const PROMPT_PERMISSIONS_MAP: Record<
+  string,
+  { action: Action; adminOnly?: boolean }
+> = {
+  'user-analysis': { action: Action.Execute },
+  'user-report': { action: Action.Execute },
+  'security-audit': { action: Action.Execute, adminOnly: true },
+};
+
 @Controller()
 @UseGuards(JwtAuthGuard, PoliciesGuard)
 export class CustomSseController {
@@ -68,7 +92,11 @@ export class CustomSseController {
     @Body()
     body: {
       method?: string;
-      params?: { name?: string; arguments?: Record<string, any> };
+      params?: {
+        name?: string;
+        uri?: string;
+        arguments?: Record<string, any>;
+      };
     },
   ): Promise<void> {
     this.logger.log(
@@ -104,6 +132,62 @@ export class CustomSseController {
         if (!hasPermission) {
           throw new ForbiddenException(
             `Você não tem permissão para executar o tool: ${toolName}`,
+          );
+        }
+      }
+    }
+
+    // Validar permissões para resources/read
+    if (body.method === 'resources/read' && body.params?.uri) {
+      const resourceUri = body.params.uri;
+      const resourcePermission = RESOURCE_PERMISSIONS_MAP[resourceUri];
+
+      if (resourcePermission) {
+        const ability = this.abilityFactory.createForUser(req.user);
+        const { action, adminOnly } = resourcePermission;
+
+        const resourceSubject = subject('Resource', {
+          adminOnly: adminOnly || false,
+          public: !adminOnly,
+        });
+
+        const hasPermission = ability.can(action, resourceSubject);
+
+        this.logger.debug(
+          `Resource: ${resourceUri}, Action: ${action}, Admin Only: ${adminOnly}, Has Permission: ${hasPermission}`,
+        );
+
+        if (!hasPermission) {
+          throw new ForbiddenException(
+            `Você não tem permissão para acessar o recurso: ${resourceUri}`,
+          );
+        }
+      }
+    }
+
+    // Validar permissões para prompts/get
+    if (body.method === 'prompts/get' && body.params?.name) {
+      const promptName = body.params.name;
+      const promptPermission = PROMPT_PERMISSIONS_MAP[promptName];
+
+      if (promptPermission) {
+        const ability = this.abilityFactory.createForUser(req.user);
+        const { action, adminOnly } = promptPermission;
+
+        const promptSubject = subject('Prompt', {
+          adminOnly: adminOnly || false,
+          public: !adminOnly,
+        });
+
+        const hasPermission = ability.can(action, promptSubject);
+
+        this.logger.debug(
+          `Prompt: ${promptName}, Action: ${action}, Admin Only: ${adminOnly}, Has Permission: ${hasPermission}`,
+        );
+
+        if (!hasPermission) {
+          throw new ForbiddenException(
+            `Você não tem permissão para executar o prompt: ${promptName}`,
           );
         }
       }

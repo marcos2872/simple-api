@@ -17,7 +17,11 @@ export type PermissionResource =
   | Partial<User>
   | 'User'
   | 'MCP'
-  | { userId: string };
+  | 'Resource'
+  | 'Prompt'
+  | { userId: string }
+  | { public: boolean }
+  | { adminOnly: boolean };
 
 export type AppAbility = MongoAbility<[Action, PermissionResource], MongoQuery>;
 @Injectable()

@@ -5,4 +5,6 @@ export enum Action {
   List = 'list',
   Update = 'update',
   Delete = 'delete',
+  Access = 'access', // For accessing resources and prompts
+  Execute = 'execute', // For executing prompts
 }
