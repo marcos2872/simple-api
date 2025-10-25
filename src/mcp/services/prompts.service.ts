@@ -24,7 +24,7 @@ export class PromptsService {
     userId?: string;
     timeframe?: string;
     includeMetrics?: string;
-  }): Promise<string> {
+  }) {
     const days =
       timeframe === '7d'
         ? 7
@@ -123,7 +123,17 @@ Please structure your analysis as follows:
 Use clear headings and bullet points for readability.
 `;
 
-    return analysisPrompt;
+    return {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: analysisPrompt,
+          },
+        },
+      ],
+    };
   }
 
   @Prompt({
@@ -143,7 +153,7 @@ Use clear headings and bullet points for readability.
     userId?: string;
     format?: string;
     includePermissions?: string;
-  }): Promise<string> {
+  }) {
     let reportPrompt = `# User Report Generation
 
 ## Report Configuration
@@ -208,7 +218,17 @@ Generate a comprehensive system-wide report analyzing user distribution and syst
 `;
     }
 
-    return reportPrompt;
+    return {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: reportPrompt,
+          },
+        },
+      ],
+    };
   }
 
   @Prompt({
@@ -225,7 +245,7 @@ Generate a comprehensive system-wide report analyzing user distribution and syst
   }: {
     scope?: string;
     severity?: string;
-  }): Promise<string> {
+  }) {
     const [totalUsers, adminCount] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.user.count({ where: { role: 'ADMIN' } }),
@@ -257,6 +277,16 @@ Analyze the user management system for security concerns and provide recommendat
 Generate a comprehensive security audit report with findings and recommendations.
 `;
 
-    return auditPrompt;
+    return {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: auditPrompt,
+          },
+        },
+      ],
+    };
   }
 }
